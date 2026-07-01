@@ -1,4 +1,3 @@
-import UploadZone from "./components/UploadZone";
 export default function Home() {
   return (
     <main style={{
@@ -31,18 +30,9 @@ export default function Home() {
           gridTemplateColumns: "repeat(3, 1fr)",
           gap: "24px"
         }}>
-          <Card
-            title="📄 Nueva revisión"
-            text="Sube una programación, elige presencial o teleformación y revisa normativa, RA, CE, metodología y evaluación."
-          />
-          <Card
-            title="🔁 Comparar documentos"
-            text="Compara dos versiones de una programación y detecta cambios, mejoras o aspectos pendientes."
-          />
-          <Card
-            title="✍️ Crear programación"
-            text="Genera una programación didáctica desde cero a partir del certificado profesional y la modalidad."
-          />
+          <Card title="📄 Nueva revisión" text="Sube una programación, elige presencial o teleformación y revisa normativa, RA, CE, metodología y evaluación." />
+          <Card title="🔁 Comparar documentos" text="Compara dos versiones de una programación y detecta cambios, mejoras o aspectos pendientes." />
+          <Card title="✍️ Crear programación" text="Genera una programación didáctica desde cero a partir del certificado profesional y la modalidad." />
         </div>
 
         <div style={{
@@ -52,20 +42,13 @@ export default function Home() {
           borderRadius: "18px",
           boxShadow: "0 10px 30px rgba(0,0,0,0.08)"
         }}>
-          <h2 style={{ color: "#12355b", marginTop: 0 }}>
-            Nueva revisión
-          </h2>
+          <h2 style={{ color: "#12355b", marginTop: 0 }}>Nueva revisión</h2>
 
           <UploadZone />
 
           <div style={{ marginTop: "24px" }}>
-            <label><strong>Código del certificado profesional</strong></label>
-            <br />
-            <input
-              type="text"
-              placeholder="Ejemplo: SSCE0110"
-              style={input}
-            />
+            <label><strong>Código del certificado profesional</strong></label><br />
+            <input type="text" placeholder="Ejemplo: SSCE0110" style={input} />
           </div>
 
           <div style={{ marginTop: "24px" }}>
@@ -90,12 +73,32 @@ export default function Home() {
             </div>
           </div>
 
-          <button style={button}>
-            Revisar programación
-          </button>
+          <button style={button}>Revisar programación</button>
         </div>
       </section>
     </main>
+  );
+}
+
+function UploadZone() {
+  return (
+    <div style={{
+      border: "2px dashed #9ca3af",
+      borderRadius: "18px",
+      padding: "40px",
+      textAlign: "center",
+      background: "#f8fafc",
+      marginTop: "20px"
+    }}>
+      <div style={{ fontSize: "48px", marginBottom: "15px" }}>📄</div>
+      <h3 style={{ color: "#12355b", marginBottom: "10px" }}>
+        Sube tu programación didáctica
+      </h3>
+      <p style={{ color: "#64748b", marginBottom: "20px" }}>
+        Formatos admitidos: DOCX y PDF
+      </p>
+      <input type="file" accept=".docx,.pdf" />
+    </div>
   );
 }
 
