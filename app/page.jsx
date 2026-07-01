@@ -1,3 +1,5 @@
+import UploadZone from "../components/UploadZone";
+
 export default function Home() {
   return (
     <main style={{
@@ -55,9 +57,7 @@ export default function Home() {
             Nueva revisión
           </h2>
 
-          <label><strong>Subir programación</strong></label>
-          <br />
-          <input type="file" accept=".docx,.pdf" style={{ marginTop: "10px" }} />
+          <UploadZone />
 
           <div style={{ marginTop: "24px" }}>
             <label><strong>Código del certificado profesional</strong></label>
