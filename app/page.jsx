@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { readDocx } from "../lib/readers/docxReader";
+import { parseProgrammingDocument } from "../lib/parser/documentParser";
 
 export default function Home() {
   const [fileName, setFileName] = useState("");
@@ -8,6 +10,32 @@ export default function Home() {
   const [codigo, setCodigo] = useState("");
   const [analizando, setAnalizando] = useState(false);
   const [resultado, setResultado] = useState(false);
+  const [datosDetectados, setDatosDetectados] = useState(null);
+
+  async function handleFileChange(e) {
+    const file = e.target.files?.[0];
+
+    if (!file) return;
+
+    setFileName(file.name);
+
+    if (!file.name.toLowerCase().endsWith(".docx")) {
+      alert("De momento estamos probando lectura real solo con DOCX.");
+      return;
+    }
+
+    const result = await readDocx(file);
+
+    if (result.success) {
+      const parsed = parseProgrammingDocument(result.text);
+      setDatosDetectados(parsed);
+      console.log("TEXTO EXTRAÍDO:", result.text);
+      console.log("DATOS DETECTADOS:", parsed);
+      alert("Documento leído correctamente. Revisa la consola del navegador.");
+    } else {
+      alert("Error al leer el documento: " + result.error);
+    }
+  }
 
   function iniciarRevision() {
     setAnalizando(true);
@@ -45,7 +73,7 @@ export default function Home() {
               Revisión normativa, pedagógica y metodológica de certificados profesionales.
             </p>
           </div>
-          <span style={styles.version}>Versión 2.1</span>
+          <span style={styles.version}>Versión 3.0</span>
         </header>
 
         <section style={styles.statsGrid}>
@@ -66,11 +94,7 @@ export default function Home() {
               <div style={styles.uploadIcon}>📄</div>
               <strong>Sube tu documento</strong>
               <p style={styles.smallText}>DOCX o PDF</p>
-              <input
-                type="file"
-                accept=".docx,.pdf"
-                onChange={(e) => setFileName(e.target.files?.[0]?.name || "")}
-              />
+              <input type="file" accept=".docx,.pdf" onChange={handleFileChange} />
               {fileName && <p style={styles.fileName}>Archivo seleccionado: {fileName}</p>}
             </div>
 
@@ -123,6 +147,22 @@ export default function Home() {
           </div>
         </section>
 
+        {datosDetectados && (
+          <section style={styles.panel}>
+            <h3 style={styles.panelTitle}>Datos detectados del documento</h3>
+            <div style={styles.summaryBox}>
+              <p><strong>Certificado:</strong> {datosDetectados.datosGenerales.certificado || "No detectado"}</p>
+              <p><strong>Duración:</strong> {datosDetectados.datosGenerales.duracion || "No detectada"}</p>
+              <p><strong>Centro:</strong> {datosDetectados.datosGenerales.centro || "No detectado"}</p>
+              <p><strong>Código módulo:</strong> {datosDetectados.datosGenerales.codigoModulo || "No detectado"}</p>
+              <p><strong>Horas módulo:</strong> {datosDetectados.datosGenerales.horasModulo || "No detectadas"}</p>
+              <p><strong>RA detectados:</strong> {datosDetectados.resultadosAprendizaje.length}</p>
+              <p><strong>CE detectados:</strong> {datosDetectados.criteriosEvaluacion.length}</p>
+              <p><strong>Actividades detectadas:</strong> {datosDetectados.actividades.length}</p>
+            </div>
+          </section>
+        )}
+
         {analizando && (
           <section style={styles.panel}>
             <h3 style={styles.panelTitle}>Analizando programación...</h3>
@@ -166,11 +206,6 @@ export default function Home() {
                 ))}
               </tbody>
             </table>
-
-            <div style={styles.actions}>
-              <button style={styles.secondaryButton}>Descargar informe PDF</button>
-              <button style={styles.secondaryButton}>Descargar Word corregido</button>
-            </div>
           </section>
         )}
       </section>
@@ -192,27 +227,6 @@ const erroresSimulados = [
     problema: "No se evidencia una relación completa entre RA, CE, actividades e instrumentos.",
     motivo: "Cada criterio de evaluación debe poder comprobarse mediante evidencias objetivas.",
     propuesta: "Crear una matriz RA-CE-Actividad-Instrumento."
-  },
-  {
-    prioridad: "Media",
-    apartado: "Estrategias metodológicas",
-    problema: "La metodología aparece descrita de forma general.",
-    motivo: "Debe concretarse cómo se trabajarán los contenidos según la modalidad elegida.",
-    propuesta: "Añadir casos prácticos, simulaciones, trabajo colaborativo y tutorías."
-  },
-  {
-    prioridad: "Alta",
-    apartado: "Temporalización",
-    problema: "No se puede comprobar la correspondencia entre horas, módulos y actividades.",
-    motivo: "La programación debe respetar la duración oficial del certificado o módulo.",
-    propuesta: "Añadir una tabla con horas por unidad, RA y actividad."
-  },
-  {
-    prioridad: "Media",
-    apartado: "Instrumentos de evaluación",
-    problema: "Faltan instrumentos concretos para algunos criterios.",
-    motivo: "La evaluación debe recoger evidencias suficientes y trazables.",
-    propuesta: "Añadir rúbricas, listas de cotejo, pruebas prácticas o cuestionarios."
   }
 ];
 
@@ -355,15 +369,6 @@ const styles = {
     fontWeight: "bold",
     cursor: "pointer"
   },
-  secondaryButton: {
-    background: "#eef3f8",
-    color: "#12355b",
-    border: "1px solid #ccd6e0",
-    borderRadius: "10px",
-    padding: "13px 18px",
-    fontWeight: "bold",
-    cursor: "pointer"
-  },
   reviewItem: {
     display: "flex",
     gap: "10px",
@@ -404,10 +409,5 @@ const styles = {
     padding: "12px",
     borderBottom: "1px solid #e5e7eb",
     verticalAlign: "top"
-  },
-  actions: {
-    display: "flex",
-    gap: "12px",
-    marginTop: "22px"
   }
 };
