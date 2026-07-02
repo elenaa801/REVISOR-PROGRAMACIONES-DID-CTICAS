@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { readDocx } from "../lib/readers/docxReader";
 import { parseProgrammingDocument } from "../lib/parser/documentParser";
-
+import { reviewProgrammingDocument } from "../lib/ai/reviewEngine";
 export default function Home() {
   const [fileName, setFileName] = useState("");
   const [modalidad, setModalidad] = useState("");
@@ -11,7 +11,7 @@ export default function Home() {
   const [analizando, setAnalizando] = useState(false);
   const [resultado, setResultado] = useState(false);
   const [datosDetectados, setDatosDetectados] = useState(null);
-
+  const [revisionReal, setRevisionReal] = useState(null);
   async function handleFileChange(e) {
     const file = e.target.files?.[0];
 
@@ -37,15 +37,18 @@ export default function Home() {
     }
   }
 
-  function iniciarRevision() {
-    setAnalizando(true);
-    setResultado(false);
+ function iniciarRevision() {
+  setAnalizando(true);
+  setResultado(false);
 
-    setTimeout(() => {
-      setAnalizando(false);
-      setResultado(true);
-    }, 1800);
-  }
+  setTimeout(() => {
+    const revision = reviewProgrammingDocument(datosDetectados, modalidad);
+
+    setRevisionReal(revision);
+    setAnalizando(false);
+    setResultado(true);
+  }, 1000);
+}
 
   return (
     <main style={styles.app}>
