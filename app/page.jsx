@@ -5,6 +5,7 @@ import { readDocx } from "../lib/readers/docxReader";
 import { parseProgrammingDocument } from "../lib/parser/documentParser";
 import { reviewProgrammingDocument } from "../lib/ai/reviewEngine";
 import { detectNormativa } from "../lib/normativa/normativaEngine";
+import NormativaPanel from "../components/NormativaPanel";
 export default function Home() {
   const [fileName, setFileName] = useState("");
   const [modalidad, setModalidad] = useState("");
@@ -48,6 +49,7 @@ export default function Home() {
     const normativa = detectNormativa(datosDetectados, modalidad);
 
     setRevisionReal(revision);
+    setNormativaDetectada(normativa);
     setAnalizando(false);
     setResultado(true);
   }, 1000);
@@ -168,6 +170,7 @@ export default function Home() {
             </div>
           </section>
         )}
+               <NormativaPanel normativa={normativaDetectada} />
 
         {analizando && (
           <section style={styles.panel}>
