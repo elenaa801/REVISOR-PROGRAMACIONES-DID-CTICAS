@@ -4,6 +4,7 @@ import { useState } from "react";
 import { readDocx } from "../lib/readers/docxReader";
 import { parseProgrammingDocument } from "../lib/parser/documentParser";
 import { reviewProgrammingDocument } from "../lib/ai/reviewEngine";
+import { detectNormativa } from "../lib/normativa/normativaEngine";
 export default function Home() {
   const [fileName, setFileName] = useState("");
   const [modalidad, setModalidad] = useState("");
@@ -12,6 +13,7 @@ export default function Home() {
   const [resultado, setResultado] = useState(false);
   const [datosDetectados, setDatosDetectados] = useState(null);
   const [revisionReal, setRevisionReal] = useState(null);
+  const [normativaDetectada, setNormativaDetectada] = useState(null);
   async function handleFileChange(e) {
     const file = e.target.files?.[0];
 
@@ -43,6 +45,7 @@ export default function Home() {
 
   setTimeout(() => {
     const revision = reviewProgrammingDocument(datosDetectados, modalidad);
+    const normativa = detectNormativa(datosDetectados, modalidad);
 
     setRevisionReal(revision);
     setAnalizando(false);
