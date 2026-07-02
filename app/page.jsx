@@ -1,240 +1,413 @@
+"use client";
+
+import { useState } from "react";
+
 export default function Home() {
+  const [fileName, setFileName] = useState("");
+  const [modalidad, setModalidad] = useState("");
+  const [codigo, setCodigo] = useState("");
+  const [analizando, setAnalizando] = useState(false);
+  const [resultado, setResultado] = useState(false);
+
+  function iniciarRevision() {
+    setAnalizando(true);
+    setResultado(false);
+
+    setTimeout(() => {
+      setAnalizando(false);
+      setResultado(true);
+    }, 1800);
+  }
+
   return (
-    <main style={styles.page}>
-      <header style={styles.header}>
-        <div>
-          <h1 style={styles.title}>ATU Review AI</h1>
-          <p style={styles.subtitle}>
-            Revisor inteligente de programaciones didácticas de certificados profesionales
-          </p>
-        </div>
-      </header>
+    <main style={styles.app}>
+      <aside style={styles.sidebar}>
+        <h1 style={styles.logo}>ATU Review AI</h1>
+        <p style={styles.logoText}>Copiloto de programaciones didácticas</p>
 
-      <section style={styles.container}>
-        <div style={styles.intro}>
-          <h2 style={styles.sectionTitle}>Panel principal</h2>
-          <p style={styles.text}>
-            Selecciona qué quieres hacer. La aplicación está preparada para revisar
-            programaciones, comparar documentos y crear programaciones desde cero.
-          </p>
-        </div>
+        <nav style={styles.nav}>
+          <NavItem icon="🏠" text="Dashboard" active />
+          <NavItem icon="📄" text="Nueva revisión" />
+          <NavItem icon="🔁" text="Comparar" />
+          <NavItem icon="✍️" text="Crear programación" />
+          <NavItem icon="📚" text="Certificados" />
+          <NavItem icon="⚖️" text="Normativa" />
+          <NavItem icon="📊" text="Informes" />
+          <NavItem icon="⚙️" text="Configuración" />
+        </nav>
+      </aside>
 
-        <div style={styles.grid}>
-          <ModuleCard
-            icon="📄"
-            title="Nueva revisión"
-            description="Sube una programación y revisa normativa, modalidad, RA, CE, metodología, temporalización e instrumentos de evaluación."
-            active
-          />
-
-          <ModuleCard
-            icon="🔁"
-            title="Comparar documentos"
-            description="Compara dos versiones de una programación para detectar cambios, mejoras y aspectos pendientes."
-          />
-
-          <ModuleCard
-            icon="✍️"
-            title="Crear programación"
-            description="Genera una programación didáctica desde cero a partir del certificado profesional y la modalidad."
-          />
-        </div>
-
-        <section style={styles.reviewBox}>
-          <h2 style={styles.sectionTitle}>Nueva revisión</h2>
-
-          <div style={styles.uploadBox}>
-            <div style={styles.uploadIcon}>📄</div>
-            <h3 style={styles.uploadTitle}>Sube tu programación didáctica</h3>
-            <p style={styles.text}>Formatos admitidos: DOCX y PDF</p>
-            <input type="file" accept=".docx,.pdf" />
+      <section style={styles.content}>
+        <header style={styles.topbar}>
+          <div>
+            <h2 style={styles.pageTitle}>Dashboard principal</h2>
+            <p style={styles.pageSubtitle}>
+              Revisión normativa, pedagógica y metodológica de certificados profesionales.
+            </p>
           </div>
+          <span style={styles.version}>Versión 2.1</span>
+        </header>
 
-          <div style={styles.formGroup}>
-            <label style={styles.label}>Código del certificado profesional</label>
-            <input
-              type="text"
-              placeholder="Ejemplo: SSCE0110"
-              style={styles.input}
-            />
-          </div>
-
-          <div style={styles.formGroup}>
-            <label style={styles.label}>Modalidad normativa</label>
-            <div style={styles.options}>
-              <label><input type="radio" name="modalidad" /> Presencial</label>
-              <label><input type="radio" name="modalidad" /> Teleformación</label>
-              <label><input type="radio" name="modalidad" /> Mixta</label>
-            </div>
-          </div>
-
-          <div style={styles.formGroup}>
-            <label style={styles.label}>Elementos que revisará la aplicación</label>
-            <div style={styles.checks}>
-              <label><input type="checkbox" defaultChecked /> Normativa según modalidad seleccionada</label>
-              <label><input type="checkbox" defaultChecked /> Estrategias metodológicas</label>
-              <label><input type="checkbox" defaultChecked /> Resultados de Aprendizaje RA</label>
-              <label><input type="checkbox" defaultChecked /> Criterios de Evaluación CE</label>
-              <label><input type="checkbox" defaultChecked /> Coherencia RA - CE - Actividades - Evaluación</label>
-              <label><input type="checkbox" defaultChecked /> Temporalización</label>
-              <label><input type="checkbox" defaultChecked /> Instrumentos de evaluación</label>
-            </div>
-          </div>
-
-          <button style={styles.primaryButton}>
-            Revisar programación
-          </button>
+        <section style={styles.statsGrid}>
+          <StatCard title="Programaciones revisadas" value={resultado ? "1" : "0"} />
+          <StatCard title="Errores detectados" value={resultado ? "5" : "0"} />
+          <StatCard title="Cumplimiento estimado" value={resultado ? "78%" : "0%"} />
+          <StatCard title="Estado" value={resultado ? "Revisar" : "Pendiente"} />
         </section>
+
+        <section style={styles.mainGrid}>
+          <div style={styles.panel}>
+            <h3 style={styles.panelTitle}>Nueva revisión</h3>
+            <p style={styles.text}>
+              Sube una programación didáctica y selecciona la modalidad normativa que debe aplicarse.
+            </p>
+
+            <div style={styles.uploadBox}>
+              <div style={styles.uploadIcon}>📄</div>
+              <strong>Sube tu documento</strong>
+              <p style={styles.smallText}>DOCX o PDF</p>
+              <input
+                type="file"
+                accept=".docx,.pdf"
+                onChange={(e) => setFileName(e.target.files?.[0]?.name || "")}
+              />
+              {fileName && <p style={styles.fileName}>Archivo seleccionado: {fileName}</p>}
+            </div>
+
+            <div style={styles.formGroup}>
+              <label style={styles.label}>Código del certificado profesional</label>
+              <input
+                style={styles.input}
+                placeholder="Ejemplo: SSCE0110"
+                value={codigo}
+                onChange={(e) => setCodigo(e.target.value)}
+              />
+            </div>
+
+            <div style={styles.formGroup}>
+              <label style={styles.label}>Modalidad</label>
+              <div style={styles.optionGrid}>
+                {["Presencial", "Teleformación", "Mixta"].map((item) => (
+                  <label key={item} style={styles.option}>
+                    <input
+                      type="radio"
+                      name="modalidad"
+                      value={item}
+                      checked={modalidad === item}
+                      onChange={(e) => setModalidad(e.target.value)}
+                    />
+                    {item}
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            <button style={styles.primaryButton} onClick={iniciarRevision}>
+              {analizando ? "Analizando..." : "Iniciar revisión"}
+            </button>
+          </div>
+
+          <div style={styles.panel}>
+            <h3 style={styles.panelTitle}>Motor de revisión</h3>
+            <p style={styles.text}>
+              La revisión comprobará los elementos clave de la programación.
+            </p>
+
+            <ReviewItem title="Normativa aplicable según modalidad" />
+            <ReviewItem title="Resultados de Aprendizaje RA" />
+            <ReviewItem title="Criterios de Evaluación CE" />
+            <ReviewItem title="Estrategias metodológicas" />
+            <ReviewItem title="Temporalización" />
+            <ReviewItem title="Instrumentos de evaluación" />
+            <ReviewItem title="Coherencia RA - CE - Actividades - Evaluación" />
+          </div>
+        </section>
+
+        {analizando && (
+          <section style={styles.panel}>
+            <h3 style={styles.panelTitle}>Analizando programación...</h3>
+            <p style={styles.text}>Leyendo documento, comprobando modalidad y preparando informe.</p>
+            <div style={styles.progressBar}>
+              <div style={styles.progressFill}></div>
+            </div>
+          </section>
+        )}
+
+        {resultado && (
+          <section style={styles.panel}>
+            <h3 style={styles.panelTitle}>Resultado de revisión simulada</h3>
+
+            <div style={styles.summaryBox}>
+              <p><strong>Documento:</strong> {fileName || "No indicado"}</p>
+              <p><strong>Certificado:</strong> {codigo || "No indicado"}</p>
+              <p><strong>Modalidad aplicada:</strong> {modalidad || "No seleccionada"}</p>
+              <p><strong>Cumplimiento estimado:</strong> 78%</p>
+            </div>
+
+            <table style={styles.table}>
+              <thead>
+                <tr>
+                  <th style={styles.th}>Prioridad</th>
+                  <th style={styles.th}>Apartado</th>
+                  <th style={styles.th}>Problema detectado</th>
+                  <th style={styles.th}>Por qué está mal</th>
+                  <th style={styles.th}>Propuesta</th>
+                </tr>
+              </thead>
+              <tbody>
+                {erroresSimulados.map((error) => (
+                  <tr key={error.apartado}>
+                    <td style={styles.td}>{error.prioridad}</td>
+                    <td style={styles.td}><strong>{error.apartado}</strong></td>
+                    <td style={styles.td}>{error.problema}</td>
+                    <td style={styles.td}>{error.motivo}</td>
+                    <td style={styles.td}>{error.propuesta}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+
+            <div style={styles.actions}>
+              <button style={styles.secondaryButton}>Descargar informe PDF</button>
+              <button style={styles.secondaryButton}>Descargar Word corregido</button>
+            </div>
+          </section>
+        )}
       </section>
     </main>
   );
 }
 
-function ModuleCard({ icon, title, description, active }) {
+const erroresSimulados = [
+  {
+    prioridad: "Alta",
+    apartado: "Modalidad normativa",
+    problema: "No queda claro si la programación está adaptada a presencial o teleformación.",
+    motivo: "La modalidad condiciona la metodología, seguimiento, evaluación y requisitos documentales.",
+    propuesta: "Indicar expresamente la modalidad y adaptar todos los apartados a ella."
+  },
+  {
+    prioridad: "Alta",
+    apartado: "RA y CE",
+    problema: "No se evidencia una relación completa entre RA, CE, actividades e instrumentos.",
+    motivo: "Cada criterio de evaluación debe poder comprobarse mediante evidencias objetivas.",
+    propuesta: "Crear una matriz RA-CE-Actividad-Instrumento."
+  },
+  {
+    prioridad: "Media",
+    apartado: "Estrategias metodológicas",
+    problema: "La metodología aparece descrita de forma general.",
+    motivo: "Debe concretarse cómo se trabajarán los contenidos según la modalidad elegida.",
+    propuesta: "Añadir casos prácticos, simulaciones, trabajo colaborativo y tutorías."
+  },
+  {
+    prioridad: "Alta",
+    apartado: "Temporalización",
+    problema: "No se puede comprobar la correspondencia entre horas, módulos y actividades.",
+    motivo: "La programación debe respetar la duración oficial del certificado o módulo.",
+    propuesta: "Añadir una tabla con horas por unidad, RA y actividad."
+  },
+  {
+    prioridad: "Media",
+    apartado: "Instrumentos de evaluación",
+    problema: "Faltan instrumentos concretos para algunos criterios.",
+    motivo: "La evaluación debe recoger evidencias suficientes y trazables.",
+    propuesta: "Añadir rúbricas, listas de cotejo, pruebas prácticas o cuestionarios."
+  }
+];
+
+function NavItem({ icon, text, active }) {
   return (
-    <article style={{
-      ...styles.card,
-      border: active ? "2px solid #12355b" : "1px solid #dbe3ec"
-    }}>
-      <div style={styles.cardIcon}>{icon}</div>
-      <h3 style={styles.cardTitle}>{title}</h3>
-      <p style={styles.text}>{description}</p>
-      {active && <span style={styles.badge}>Disponible ahora</span>}
-      {!active && <span style={styles.badgeMuted}>Próximamente</span>}
-    </article>
+    <div style={{ ...styles.navItem, background: active ? "#ffffff22" : "transparent" }}>
+      <span>{icon}</span>
+      <span>{text}</span>
+    </div>
+  );
+}
+
+function StatCard({ title, value }) {
+  return (
+    <div style={styles.statCard}>
+      <p style={styles.smallText}>{title}</p>
+      <strong style={styles.statValue}>{value}</strong>
+    </div>
+  );
+}
+
+function ReviewItem({ title }) {
+  return (
+    <div style={styles.reviewItem}>
+      <span>✅</span>
+      <span>{title}</span>
+    </div>
   );
 }
 
 const styles = {
-  page: {
+  app: {
     minHeight: "100vh",
+    display: "flex",
     background: "#eef3f8",
     fontFamily: "Arial, sans-serif",
     color: "#1f2937"
   },
-  header: {
+  sidebar: {
+    width: "285px",
     background: "#12355b",
     color: "white",
-    padding: "55px 30px",
-    textAlign: "center"
+    padding: "28px 20px",
+    minHeight: "100vh"
   },
-  title: {
-    fontSize: "44px",
-    margin: 0
+  logo: { fontSize: "24px", margin: 0 },
+  logoText: { fontSize: "13px", color: "#cbd5e1", marginTop: "8px", marginBottom: "35px" },
+  nav: { display: "grid", gap: "8px" },
+  navItem: {
+    display: "flex",
+    gap: "12px",
+    alignItems: "center",
+    padding: "14px 12px",
+    borderRadius: "10px",
+    cursor: "pointer",
+    fontSize: "15px"
   },
-  subtitle: {
-    fontSize: "18px",
-    marginTop: "12px"
+  content: { flex: 1, padding: "35px" },
+  topbar: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: "28px"
   },
-  container: {
-    maxWidth: "1100px",
-    margin: "40px auto",
-    padding: "0 24px"
+  pageTitle: { margin: 0, color: "#12355b", fontSize: "34px" },
+  pageSubtitle: { color: "#64748b", marginTop: "8px" },
+  version: {
+    background: "white",
+    border: "1px solid #dbe3ec",
+    padding: "10px 14px",
+    borderRadius: "999px",
+    color: "#12355b",
+    fontWeight: "bold"
   },
-  intro: {
+  statsGrid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))",
+    gap: "18px",
     marginBottom: "24px"
   },
-  sectionTitle: {
-    color: "#12355b",
-    marginTop: 0
+  statCard: {
+    background: "white",
+    padding: "22px",
+    borderRadius: "16px",
+    boxShadow: "0 8px 20px rgba(0,0,0,0.06)"
   },
-  text: {
-    color: "#526174",
-    lineHeight: "1.6"
-  },
-  grid: {
+  statValue: { fontSize: "32px", color: "#12355b" },
+  mainGrid: {
     display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
-    gap: "24px"
+    gridTemplateColumns: "1.2fr 0.8fr",
+    gap: "24px",
+    marginBottom: "24px"
   },
-  card: {
+  panel: {
     background: "white",
     padding: "28px",
     borderRadius: "18px",
-    boxShadow: "0 10px 30px rgba(0,0,0,0.08)"
+    boxShadow: "0 10px 30px rgba(0,0,0,0.08)",
+    marginBottom: "24px"
   },
-  cardIcon: {
-    fontSize: "42px",
-    marginBottom: "15px"
-  },
-  cardTitle: {
-    color: "#12355b",
-    fontSize: "24px",
-    marginTop: 0
-  },
-  badge: {
-    display: "inline-block",
-    marginTop: "15px",
-    background: "#dcfce7",
-    color: "#166534",
-    padding: "8px 12px",
-    borderRadius: "999px",
-    fontSize: "13px",
-    fontWeight: "bold"
-  },
-  badgeMuted: {
-    display: "inline-block",
-    marginTop: "15px",
-    background: "#f1f5f9",
-    color: "#64748b",
-    padding: "8px 12px",
-    borderRadius: "999px",
-    fontSize: "13px",
-    fontWeight: "bold"
-  },
-  reviewBox: {
-    background: "white",
-    marginTop: "35px",
-    padding: "35px",
-    borderRadius: "18px",
-    boxShadow: "0 10px 30px rgba(0,0,0,0.08)"
-  },
+  panelTitle: { color: "#12355b", marginTop: 0, fontSize: "24px" },
+  text: { color: "#526174", lineHeight: "1.6" },
+  smallText: { color: "#64748b", fontSize: "14px" },
   uploadBox: {
     border: "2px dashed #9ca3af",
-    borderRadius: "18px",
-    padding: "38px",
-    textAlign: "center",
     background: "#f8fafc",
+    borderRadius: "16px",
+    padding: "30px",
+    textAlign: "center",
     marginTop: "20px"
   },
-  uploadIcon: {
-    fontSize: "46px"
-  },
-  uploadTitle: {
-    color: "#12355b"
-  },
-  formGroup: {
-    marginTop: "26px"
-  },
-  label: {
-    display: "block",
-    fontWeight: "bold",
-    marginBottom: "10px"
-  },
+  uploadIcon: { fontSize: "42px", marginBottom: "10px" },
+  fileName: { marginTop: "14px", color: "#12355b", fontWeight: "bold" },
+  formGroup: { marginTop: "24px" },
+  label: { display: "block", fontWeight: "bold", marginBottom: "10px" },
   input: {
-    padding: "13px",
     width: "100%",
-    border: "1px solid #ccd6e0",
+    padding: "13px",
     borderRadius: "8px",
+    border: "1px solid #ccd6e0",
     fontSize: "15px"
   },
-  options: {
-    display: "grid",
-    gap: "10px"
-  },
-  checks: {
-    display: "grid",
-    gap: "10px"
+  optionGrid: { display: "grid", gap: "10px" },
+  option: {
+    border: "1px solid #dbe3ec",
+    borderRadius: "10px",
+    padding: "12px",
+    display: "flex",
+    gap: "10px",
+    alignItems: "center"
   },
   primaryButton: {
-    marginTop: "32px",
+    marginTop: "28px",
     background: "#12355b",
     color: "white",
-    padding: "15px 30px",
     border: "none",
     borderRadius: "10px",
+    padding: "15px 28px",
     fontSize: "16px",
-    cursor: "pointer",
-    fontWeight: "bold"
+    fontWeight: "bold",
+    cursor: "pointer"
+  },
+  secondaryButton: {
+    background: "#eef3f8",
+    color: "#12355b",
+    border: "1px solid #ccd6e0",
+    borderRadius: "10px",
+    padding: "13px 18px",
+    fontWeight: "bold",
+    cursor: "pointer"
+  },
+  reviewItem: {
+    display: "flex",
+    gap: "10px",
+    padding: "12px 0",
+    borderBottom: "1px solid #e5e7eb"
+  },
+  progressBar: {
+    height: "12px",
+    background: "#e5e7eb",
+    borderRadius: "999px",
+    overflow: "hidden"
+  },
+  progressFill: {
+    height: "100%",
+    width: "70%",
+    background: "#12355b"
+  },
+  summaryBox: {
+    background: "#f8fafc",
+    border: "1px solid #dbe3ec",
+    borderRadius: "14px",
+    padding: "18px",
+    marginBottom: "22px"
+  },
+  table: {
+    width: "100%",
+    borderCollapse: "collapse",
+    fontSize: "14px"
+  },
+  th: {
+    textAlign: "left",
+    background: "#f1f5f9",
+    color: "#12355b",
+    padding: "12px",
+    borderBottom: "1px solid #dbe3ec"
+  },
+  td: {
+    padding: "12px",
+    borderBottom: "1px solid #e5e7eb",
+    verticalAlign: "top"
+  },
+  actions: {
+    display: "flex",
+    gap: "12px",
+    marginTop: "22px"
   }
 };
